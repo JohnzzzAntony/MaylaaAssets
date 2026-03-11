@@ -4,11 +4,11 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('currentUser');
+    const savedUser = sessionStorage.getItem('currentUser');
     return savedUser ? JSON.parse(savedUser) : null;
   });
   const [selectedEntity, setSelectedEntity] = useState(() => {
-    return localStorage.getItem('currentEntity') || null;
+    return sessionStorage.getItem('currentEntity') || null;
   });
 
   const [users, setUsers] = useState(() => {
@@ -29,17 +29,17 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      sessionStorage.setItem('currentUser', JSON.stringify(user));
     } else {
-      localStorage.removeItem('currentUser');
+      sessionStorage.removeItem('currentUser');
     }
   }, [user]);
 
   useEffect(() => {
     if (selectedEntity) {
-      localStorage.setItem('currentEntity', selectedEntity);
+      sessionStorage.setItem('currentEntity', selectedEntity);
     } else {
-      localStorage.removeItem('currentEntity');
+      sessionStorage.removeItem('currentEntity');
     }
   }, [selectedEntity]);
 
