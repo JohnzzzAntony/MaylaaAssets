@@ -350,3 +350,89 @@ h1, h2, h3, h4 {
   z-index: -1;
   filter: blur(30px);
 }
+
+/* Shiny Title Animation for Maylaa International Trading */
+@keyframes textShine {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animated-title {
+  background: linear-gradient(270deg, #ffffff, #a855f7, #6366f1, #10b981, #ffffff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShine 8s ease infinite;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+    padding: 10px;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .sidebar-container {
+    width: 100%;
+    padding: 20px;
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  .sidebar-container > div:nth-child(2) {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    height: auto;
+    overflow-y: visible;
+  }
+
+  .main-container {
+    animation: slideUp 0.8s ease-out;
+    min-height: 80vh;
+  }
+
+  .content-area {
+    padding: 10px;
+  }
+
+  .header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px;
+  }
+
+  .header > div:last-child {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .glass {
+    padding: 20px !important;
+  }
+
+  /* Table responsiveness wrapper */
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Login page tweaks */
+  .login-screen .glass {
+    padding: 30px !important;
+    width: 90% !important;
+  }
+
+  .login-glow {
+    width: 300px;
+    height: 300px;
+  }
+
+  /* Search bar tweak */
+  .glass > div > div {
+    width: 100% !important;
+  }
+}

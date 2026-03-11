@@ -34,7 +34,7 @@ const Login = () => {
             style={{ width: '140px', marginBottom: '24px' }}
             onError={(e) => { e.target.style.display = 'none'; }}
           />
-          <h2 className="gradient-text" style={{ fontSize: '1.75rem', marginBottom: '8px' }}>Maylaa International Trading</h2>
+          <h2 className="animated-title" style={{ fontSize: '1.75rem', marginBottom: '8px' }}>Maylaa International Trading</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Asset Managment</p>
         </div>
         
