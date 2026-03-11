@@ -1,44 +1,38 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import fs from 'fs';
-import path from 'path';
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import pkg from 'pg';
+const { Pool } = pkg;
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
-const dataDir = path.join(process.cwd(), 'asset-data');
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir);
-}
+// Set up PostgreSQL connection pool
+// For local development, it can use a local postgres string.
+// For production, it takes the DATABASE_URL from Render/Supabase.
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/maylaa',
+  ssl: process.env.DATABASE_URL ? {
+    rejectUnauthorized: false
+  } : false // use SSL only in production (if DATABASE_URL is set)
+});
 
-const dbDir = path.join(dataDir, 'database.sqlite');
-let db;
-
-// Initialize SQLite database
+// Initialize database table
 const initDb = async () => {
     try {
-        db = await open({
-          filename: dbDir,
-          driver: sqlite3.Database
-        });
-        
-        await db.exec(`
+        await pool.query(`
           CREATE TABLE IF NOT EXISTS assets (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             category TEXT,
             entity TEXT,
             is_deleted INTEGER DEFAULT 0,
             data_json TEXT
           )
         `);
-        
-        console.log('SQL Database (SQLite) initialized successfully at', dbDir);
+        console.log('PostgreSQL database initialized successfully');
     } catch (err) {
-        console.error('Failed to initialize local SQL database:', err);
+        console.error('Failed to initialize PostgreSQL database:', err);
     }
 };
 
@@ -53,7 +47,7 @@ app.get('/', (req, res) => {
 // GET all assets across all categories
 app.get('/api/assets/all', async (req, res) => {
     try {
-        const rows = await db.all('SELECT * FROM assets WHERE is_deleted = 0');
+        const { rows } = await pool.query('SELECT * FROM assets WHERE is_deleted = 0');
         const data = rows.map(row => ({
             ...JSON.parse(row.data_json),
             category: row.category // Include category for global analytics
@@ -69,7 +63,7 @@ app.get('/api/assets/all', async (req, res) => {
 app.get('/api/assets/:category', async (req, res) => {
     const category = req.params.category;
     try {
-        const rows = await db.all('SELECT * FROM assets WHERE category = ? AND is_deleted = 0', category);
+        const { rows } = await pool.query('SELECT * FROM assets WHERE category = $1 AND is_deleted = 0', [category]);
         const data = rows.map(row => JSON.parse(row.data_json));
         res.json(data);
     } catch (error) {
@@ -87,27 +81,30 @@ app.post('/api/assets/:category', async (req, res) => {
         return res.status(400).json({ error: 'Body must be an array of asset objects' });
     }
 
+    const client = await pool.connect();
+
     try {
-        await db.run('BEGIN TRANSACTION');
+        await client.query('BEGIN');
         
         // Delete existing category data to overwrite
-        await db.run('DELETE FROM assets WHERE category = ?', category);
+        await client.query('DELETE FROM assets WHERE category = $1', [category]);
         
         // Insert new data
-        const stmt = await db.prepare('INSERT INTO assets (category, entity, is_deleted, data_json) VALUES (?, ?, ?, ?)');
+        const insertQuery = 'INSERT INTO assets (category, entity, is_deleted, data_json) VALUES ($1, $2, $3, $4)';
         for (const item of dataArray) {
             const entity = item.Entity || 'Unknown';
             const isDeleted = item.isDeleted ? 1 : 0;
-            await stmt.run(category, entity, isDeleted, JSON.stringify(item));
+            await client.query(insertQuery, [category, entity, isDeleted, JSON.stringify(item)]);
         }
-        await stmt.finalize();
         
-        await db.run('COMMIT');
-        res.json({ message: 'Saved successfully to local SQL database' });
+        await client.query('COMMIT');
+        res.json({ message: 'Saved successfully to cloud database' });
     } catch (error) {
-        if (db) await db.run('ROLLBACK');
+        await client.query('ROLLBACK');
         console.error("Error writing to database:", error);
         res.status(500).json({ error: 'Failed to write to database' });
+    } finally {
+        client.release();
     }
 });
 
@@ -115,3 +112,4 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Node Server running on port ${PORT}`);
 });
+
