@@ -38,9 +38,23 @@ const initDb = async () => {
 
 initDb();
 
-// Simple health-check route so the root URL doesn't return 404
-app.get('/', (req, res) => {
-    res.send('Maylaa Assets API Server is running beautifully! 🚀');
+// Enhanced health-check route to diagnose database connection issues
+app.get('/', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT 1 as test');
+        res.json({
+            status: 'Running beautifully! 🚀',
+            database_connection: 'SUCCESS - Connected to cloud database',
+            db_test_result: result.rows[0].test
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: 'Running, but database connection FAILED ❌',
+            error_message: err.message,
+            error_code: err.code,
+            hint: 'Check if your DATABASE_URL is set correctly in Render and if the password is correct.'
+        });
+    }
 });
 
 
