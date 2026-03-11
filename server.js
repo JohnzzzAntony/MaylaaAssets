@@ -44,6 +44,12 @@ const initDb = async () => {
 
 initDb();
 
+// Simple health-check route so the root URL doesn't return 404
+app.get('/', (req, res) => {
+    res.send('Maylaa Assets API Server is running beautifully! 🚀');
+});
+
+
 // GET all assets across all categories
 app.get('/api/assets/all', async (req, res) => {
     try {
