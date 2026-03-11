@@ -435,4 +435,8 @@ h1, h2, h3, h4 {
   .glass > div > div {
     width: 100% !important;
   }
+
+  .hide-on-mobile {
+    display: none;
+  }
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { Building2 } from 'lucide-react';
+import { Building2, LogOut } from 'lucide-react';
 
 const ENTITIES = [
   "AL MARAJ PERFUMES", "ASRAR PERFUMES", "ATELIER PERFUMES",
@@ -12,7 +12,7 @@ const ENTITIES = [
 ];
 
 const EntitySelection = () => {
-  const { user, selectedEntity, setSelectedEntity } = useAuth();
+  const { user, selectedEntity, setSelectedEntity, logout } = useAuth();
   const navigate = useNavigate();
 
   if (!user) {
@@ -24,10 +24,25 @@ const EntitySelection = () => {
     navigate('/dashboard/desktop');
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
-    <div className="login-screen">
+    <div className="login-screen" style={{ position: 'relative' }}>
+      <button 
+        className="btn btn-ghost" 
+        style={{ position: 'absolute', top: '24px', right: '24px', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)', zIndex: 10 }} 
+        onClick={handleLogout}
+      >
+        <LogOut size={18} />
+        <span className="hide-on-mobile">Sign Out</span>
+      </button>
+
       <div className="app-bg"></div>
       <div className="login-glow"></div>
+
       
       <div className="glass" style={{ width: '100%', maxWidth: '900px', padding: '60px', textAlign: 'center' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px' }}>

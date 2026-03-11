@@ -35,7 +35,7 @@ const Login = () => {
             onError={(e) => { e.target.style.display = 'none'; }}
           />
           <h2 className="animated-title" style={{ fontSize: '1.75rem', marginBottom: '8px' }}>Maylaa International Trading</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Asset Managment</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>Asset Management</p>
         </div>
         
         {error && <div style={{ color: '#ef4444', marginBottom: '24px', fontSize: '0.85rem', padding: '12px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>{error}</div>}

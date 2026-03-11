@@ -48,7 +48,7 @@ const Sidebar = () => {
         />
         <h3 className="gradient-text" style={{ fontSize: '1.25rem', marginBottom: '4px' }}>Maylaa International Trading</h3>
         <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-          Asset Managment
+          Asset Management
         </span>
       </div>
       
